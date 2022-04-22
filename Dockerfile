@@ -1,4 +1,4 @@
-FROM python:alpine3.15 as builder
+FROM python:alpine3.15
 
 LABEL maintainer="Renato Gomes <renatogomessilverio@gmail.com>"
 
