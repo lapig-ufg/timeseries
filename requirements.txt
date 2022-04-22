@@ -4,3 +4,4 @@ earthengine-api==0.1.306
 fastapi==0.75.2
 python-decouple==3.6
 PyYAML==6.0
+pymongo==4.1.1
