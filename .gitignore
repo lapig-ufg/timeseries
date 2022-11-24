@@ -6,6 +6,9 @@ __pycache__/
 # C extensions
 *.so
 
+*.Jenkinsfile
+*.Dockerfile
+
 # Distribution / packaging
 .Python
 build/
