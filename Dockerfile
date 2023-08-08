@@ -6,6 +6,9 @@ LABEL maintainer="Renato Gomes <renatogomessilverio@gmail.com>"
 ENV URL_TO_APPLICATION_GITHUB="https://github.com/lapig-ufg/timeseries.git"
 ENV BRANCH="main"
 
+ENV APP_ENV=development \
+    APP_DEBUG=true 
+
 RUN /bin/sh -c "apk add --no-cache bash" && \
     apk update && apk add figlet git curl wget  && \
     mkdir -p /APP && cd /APP && git clone -b ${BRANCH} ${URL_TO_APPLICATION_GITHUB} && \

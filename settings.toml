@@ -1,0 +1,32 @@
+[default]
+HTTPS = false
+
+APP_NAME='Timeseries Indexes'
+API_NAME = 'timeseries-indexs'
+TOKEN='LAPIG'
+
+
+PORT=3002
+HOST='127.0.0.1'
+
+SERVER_URL='http://localhost:3002'
+
+GEE_CREDENCIALS_DIR=''
+
+LOG_CONFIG=''
+
+ORIGINS=[
+    "https://tvi.lapig.iesa.ufg.br"
+]
+
+
+
+
+DB_USER = 'user'
+DB_PASSWORD = '123456'
+DB_HOST = 'localhost'
+DB_PORT = '5432'
+DB_DATABASE = 'gdb'
+
+MONGODB_URL = 'localhost:27017'
+MONGO_DB=timeseries
