@@ -1,6 +1,6 @@
 FROM python:3.10.12-alpine3.17
 
-LABEL maintainer="Jairo Matos da Rocha <rjairo@geocodelabs.com>"
+LABEL maintainer="Jairo Matos da Rocha <jairo@geocodelabs.com>"
 
 # Clone app and npm install on server
 ENV URL_TO_APPLICATION_GITHUB="https://github.com/lapig-ufg/timeseries.git"
