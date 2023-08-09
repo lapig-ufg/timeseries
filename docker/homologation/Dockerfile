@@ -15,7 +15,8 @@ ENV URL_TO_APPLICATION_GITHUB="https://github.com/lapig-ufg/timeseries.git" \
     PIP_DISABLE_PIP_VERSION_CHECK=on \
     PIP_DEFAULT_TIMEOUT=100 \
     PYSETUP_PATH="/opt/pysetup" \
-    VENV_PATH="/opt/pysetup/.venv"
+    VENV_PATH="/opt/pysetup/.venv" \
+    DOCKER_BASE_PATH="./docker/homologation"
 
 
 ###############################################
@@ -26,7 +27,7 @@ FROM python-base as production
 WORKDIR /APP
 
 
-COPY ./start.sh /APP
+COPY ${DOCKER_BASE_PATH}/start.sh /APP
 COPY ./version.jso* /APP
 
 
