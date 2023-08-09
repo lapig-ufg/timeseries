@@ -12,12 +12,13 @@ router = APIRouter()
 
 @router.get('json/{lon}/{lat}')
 def ndvi_data(*, db: MongoClient = ActiveMongo, lon: float, lat: float):
-    series = db.evi_ndvi.find_one({'lon': lon, 'lat': lat})
+    timeseries = db['timeseries']
+    series = timeseries.evi_ndvi.find_one({'lon': lon, 'lat': lat})
     if series is not None:
         return series['data']
     else:
         _data = getMODIS_Series(lon, lat)
-        db.evi_ndvi.insert_one({'lon': lon, 'lat': lat, 'data': _data})
+        timeseries.evi_ndvi.insert_one({'lon': lon, 'lat': lat, 'data': _data})
         return _data
 
 
