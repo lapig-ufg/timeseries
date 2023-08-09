@@ -9,7 +9,7 @@ TOKEN='LAPIG'
 PORT=8012
 HOST='127.0.0.1'
 
-MONGODB_URL = 'localhost:27020'
+MONGODB_URL = 'localhost:27017'
 MONGO_DB='timeseries'
 
 SERVER_URL='http://localhost:3002'
@@ -30,14 +30,14 @@ echo = false
 
 
 [main]
-PORT=8080
+PORT=8000
 HOST='0.0.0.0'
 ORIGINS=[
     "https://tvi.lapig.iesa.ufg.br"
 ]
 
 [develop]
-PORT=8080
+PORT=8000
 HOST='0.0.0.0'
 ORIGINS=[
     "https://tvi.lapig.iesa.ufg.br"

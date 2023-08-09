@@ -1,3 +1,8 @@
+# LAPGI DEV
+.secrets.toml
+mnt
+ssh
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
