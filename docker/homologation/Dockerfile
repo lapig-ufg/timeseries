@@ -6,7 +6,7 @@ LABEL maintainer="Jairo Matos da Rocha <jairo@geocodelabs.com>"
 
 ENV URL_TO_APPLICATION_GITHUB="https://github.com/lapig-ufg/timeseries.git" \
     LAPIG_BRANCH="develop" \
-    LAPIG_APP_DEBUG=true  \
+    LAPIG_APP_DEBUG=false  \
     LAPIG_API_NAME=timeseries-indexs-dev \
     ENV_FOR_DYNACONF=${LAPIG_BRANCH} \
     PYTHONUNBUFFERED=1 \
@@ -25,8 +25,6 @@ FROM python-base as production
 
 WORKDIR /APP
 
-COPY ./ssh /root/.ssh 
-COPY ./.env /APP/.env
 
 COPY ./start.sh /APP
 COPY ./version.jso* /APP
