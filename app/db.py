@@ -3,17 +3,18 @@ from fastapi import Depends
 from sqlmodel import Session, create_engine
 
 from .config import settings
+from pymongo import MongoClient
 
-engine = create_engine(
-    settings.db.uri,
-    echo=settings.db.echo,
-    connect_args=settings.db.connect_args,
-)
-
-
-def get_session_postgis():
-    with Session(engine) as session:
-        yield session
+##engine = create_engine(
+#    settings.db.uri,
+#    echo=settings.db.echo,
+#    connect_args=settings.db.connect_args,
+#)
+#
+#
+#def get_session_postgis():
+#    with Session(engine) as session:
+#        yield session
 
 
 
@@ -23,4 +24,4 @@ def get_session_mongo():
 
 
 ActiveMongo = Depends(get_session_mongo)
-ActivePostGis = Depends(get_session_postgis)
+#ActivePostGis = Depends(get_session_postgis)

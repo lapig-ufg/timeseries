@@ -1,22 +1,29 @@
-import os
 import sys
 
 from dynaconf import Dynaconf
 from loguru import logger
 
-
-def start_logger():
-    type_logger = 'development'
-    if os.environ.get('APP_DEBUG') == True:
-        type_logger = 'production'
-    logger.info(f'The system is operating in mode {type_logger}')
-
+settings = Dynaconf(
+    envvar_prefix='LAPIG',
+    settings_files=[
+        'settings.toml',
+        '.secrets.toml',
+        '../settings.toml',
+        '/data/settings.toml',
+    ],
+    environments=True,
+    load_dotenv=True,
+)
 
 confi_format = '[ {time} | process: {process.id} | {level: <8}] {module}.{function}:{line} {message}'
 rotation = '500 MB'
 
 
-if os.environ.get('APP_DEBUG') == True:
+def start_logger():
+    logger.info(f'The system is operating in mode {settings.BRANCH}')
+
+
+if settings.APP_DEBUG == False:
     logger.remove()
     logger.add(sys.stderr, level='INFO', format=confi_format)
 
@@ -26,7 +33,7 @@ try:
     )
 except:
     logger.add(
-        '../logs/timeseries/timeseries.log',
+        './logs/timeseries/timeseries.log',
         rotation=rotation,
         level='INFO',
     )
@@ -38,19 +45,7 @@ try:
     )
 except:
     logger.add(
-        '../logs/timeseries/timeseries_WARNING.log',
+        './logs/timeseries/timeseries_WARNING.log',
         level='WARNING',
         rotation=rotation,
     )
-
-settings = Dynaconf(
-    envvar_prefix='MINIO',
-    settings_files=[
-        'settings.toml',
-        '.secrets.toml',
-        '../settings.toml',
-        '/data/settings.toml',
-    ],
-    environments=True,
-    load_dotenv=True,
-)

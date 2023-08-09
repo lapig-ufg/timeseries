@@ -1,3 +1,5 @@
+import os
+from json import load as jload
 from pathlib import Path
 
 from fastapi import FastAPI, status
@@ -9,20 +11,17 @@ from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.exceptions import HTTPException as StarletteHTTPException
-from json import load as jload
+
 from app.config import logger, settings, start_logger
 from app.middleware.analytics import Analytics
 from app.middleware.TokenMiddleware import TokenMiddleware
-
-from .routers import created_routes
+from app.routers import created_routes
 
 start_logger()
 
 app = FastAPI()
 app.add_middleware(TokenMiddleware)
 app.add_middleware(Analytics, api_name=settings.API_NAME)
-
-
 
 
 app.add_middleware(
@@ -111,7 +110,7 @@ def custom_openapi():
         title='Lapig - Laboratório de Processamento de Imagens e Geoprocessamento',
         version=version,
         contact={'name': 'Lapig', 'url': 'https://lapig.iesa.ufg.br/'},
-        description='API para baixar dados do mapserver',
+        description='API de timeseries do Lapig',
         routes=app.routes,
     )
     openapi_schema['info']['x-logo'] = {
@@ -122,3 +121,4 @@ def custom_openapi():
 
 
 app.openapi = custom_openapi
+

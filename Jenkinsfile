@@ -4,71 +4,130 @@ node {
     def application_name= "app_time_series"
 
         stage('Checkout') {
-            git branch: 'main',
-            url: 'https://github.com/lapig-ufg/timeseries.git'
-        }
-        stage('Validate') {
-            sh 'git pull origin main'
-
-        }
-        stage('SonarQube analysis') {
-
-		def scannerHome = tool 'sonarqube-scanner';
-                    withSonarQubeEnv("sonarqube") {
-                    sh "${tool("sonarqube-scanner")}/bin/sonar-scanner \
-                    -Dsonar.projectKey=lapig-jobs \
-                    -Dsonar.sources=. \
-                    -Dsonar.css.node=. \
-                    -Dsonar.host.url=$SonarUrl \
-                    -Dsonar.login=$SonarKeyProject"
-                    }
-        }
-        stage('Building Image') {
-            dockerImage = docker.build registryprod + "/$application_name:$BUILD_NUMBER", "--build-arg  --no-cache -f Dockerfile ."
-        }
-        stage('Push Image to Registry') {
-
-            docker.withRegistry( "$Url_Private_Registry", "$registryCredential" ) {
-            dockerImage.push("${env.BUILD_NUMBER}")
-            dockerImage.push("latest")
-
-                }   
+            if (env.BRANCH_NAME == 'main') {
+                echo 'main'
+                git branch: 'main',
+                url: 'https://github.com/lapig-ufg/timeseries.git'
 
             }
-        stage('Removing image Locally') {
-            sh "docker rmi $registryprod/$application_name:$BUILD_NUMBER"
-            sh "docker rmi $registryprod/$application_name:latest"
-        }
-
-        stage ('Pull imagem on PROD') {
-        sshagent(credentials : ['KEY_FULL']) {
-            sh "$SERVER_PROD_SSH 'docker pull $registryprod/$application_name:latest'"
-                }
+            if (env.BRANCH_NAME == 'develop') {
+                echo 'develop'
+                git branch: 'develop',
+                url: 'https://github.com/lapig-ufg/timeseries.git'
+            }
             
         }
 
-        stage('Deploy container on PROD') {
 
-                        configFileProvider([configFile(fileId: "$File_Json_Id_APP_TIME_SERIES_PROD", targetLocation: 'container-lapig-jobs-deploy-prod.json')]) {
+        stage('Validate') {
+            if (env.BRANCH_NAME == 'main') {
+                sh 'git pull origin main'
+            }
+            if (env.BRANCH_NAME == 'develop') {
+                sh 'git pull origin develop'
+            }
 
-                            def url = "http://$SERVER_PROD/containers/$application_name?force=true"
-                            def response = sh(script: "curl -v -X DELETE $url", returnStdout: true).trim()
-                            echo response
+        }
+        
 
-                            url = "http://$SERVER_PROD/containers/create?name=$application_name"
-                            response = sh(script: "curl -v -X POST -H 'Content-Type: application/json' -d @container-lapig-jobs-deploy-prod.json -s $url", returnStdout: true).trim()
-                            echo response
+        stage('Obter ID do commit') {
+            script {
+                    def commitId = sh(returnStdout: true, script: 'git log --pretty=format:%h -n 1').trim()
+                    def json = [:]
+                    json['commitId'] = commitId
+                    writeFile(file: 'version.json', text: groovy.json.JsonOutput.toJson(json))
+            }
+        }
+
+        stage('Building Image') {
+             if (env.BRANCH_NAME == 'main') {
+                dockerImage = docker.build registryprod + "/$application_name:$BUILD_NUMBER", " -f docker/production/Dockerfile . --no-cache"
+            }
+            if (env.BRANCH_NAME == 'develop') {
+                dockerImage = docker.build registryhomol + "/$application_name:$BUILD_NUMBER", " -f docker/homologation/Dockerfile . --no-cache"
+            }
+        }
+
+
+
+
+        stage('Push Image to Registry') {
+            docker.withRegistry( "$Url_Private_Registry", "$registryCredential" ) {
+                dockerImage.push("${env.BUILD_NUMBER}")
+                dockerImage.push("latest")
+                }   
+
+            }
+
+
+        stage('Removing image Locally') {
+            if (env.BRANCH_NAME == 'main') {
+                sh "docker rmi $registryprod/$application_name:$BUILD_NUMBER"
+                sh "docker rmi $registryprod/$application_name:latest"
+            }
+            if (env.BRANCH_NAME == 'develop') {
+                sh "docker rmi $registryhomol/$application_name:$BUILD_NUMBER"
+                sh "docker rmi $registryhomol/$application_name:latest"
+            }
+            
+        }
+
+        stage ('Pull imagem') {
+            if (env.BRANCH_NAME == 'main') {
+                sshagent(credentials : ['KEY_FULL']) {
+                    sh "$SERVER_PROD_SSH 'docker pull $registryPROD/$application_name:latest'"
                         }
+            }
+            if (env.BRANCH_NAME == 'develop') {
+                sshagent(credentials : ['KEY_FULL']) {
+                    sh "$SERVER_HOMOL_SSH 'docker pull $registryhomol/$application_name:latest'"
+                        }
+            }
+            
+        }
 
-            }            
-        stage('Start container on PROD') {
+        stage('Deploy container') {
+            if (env.BRANCH_NAME == 'main') {
+                configFileProvider([configFile(fileId: "$File_Json_Id_APP_TIME_SERIES_PROD", targetLocation: 'container-lapig-jobs-deploy-prod.json')]) {
 
+                    def url = "http://$SERVER_PROD/containers/$application_name?force=true"
+                    def response = sh(script: "curl -v -X DELETE $url", returnStdout: true).trim()
+                    echo response
+
+                    url = "http://$SERVER_PROD/containers/create?name=$application_name"
+                    response = sh(script: "curl -v -X POST -H 'Content-Type: application/json' -d @container-lapig-jobs-deploy-prod.json -s $url", returnStdout: true).trim()
+                    echo response
+                }
+            }
+            if (env.BRANCH_NAME == 'develop') {
+                configFileProvider([configFile(fileId: "$File_Json_Id_APP_TIME_SERIES_HOMOL", targetLocation: 'container-lapig-jobs-deploy-prod.json')]) {
+
+                    def url = "http://$SERVER_HOMOL/containers/$application_name?force=true"
+                    def response = sh(script: "curl -v -X DELETE $url", returnStdout: true).trim()
+                    echo response
+
+                    url = "http://$SERVER_HOMOL/containers/create?name=$application_name"
+                    response = sh(script: "curl -v -X POST -H 'Content-Type: application/json' -d @container-lapig-jobs-deploy-homol.json -s $url", returnStdout: true).trim()
+                    echo response
+                }
+            }
+
+        }   
+
+
+        stage('Start container') {
+            if (env.BRANCH_NAME == 'main') {
                         final String url = "http://$SERVER_PROD/containers/$application_name/start"
                         final String response = sh(script: "curl -v -X POST -s $url", returnStdout: true).trim()
-                        echo response                    
+                        echo response 
+            }
+            if (env.BRANCH_NAME == 'develop') {
+                        final String url = "http://$SERVER_HOMOL/containers/$application_name/start"
+                        final String response = sh(script: "curl -v -X POST -s $url", returnStdout: true).trim()
+                        echo response 
+            }
+        }   
 
-
-            }                      
         stage('Send message to Telegram') {
 
                             def Author_Name=sh(script: "git show -s --pretty=%an", returnStdout: true).trim()

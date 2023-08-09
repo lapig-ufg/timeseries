@@ -60,7 +60,7 @@ class Analytics(BaseHTTPMiddleware):
     ) -> Response:
         start = time()
         response = await call_next(request)
-        
+
         try:
             is_teste = request.headers['x-download-test']
         except:
@@ -71,7 +71,7 @@ class Analytics(BaseHTTPMiddleware):
                 for key, value in dict(response.headers).items()
                 if 'x-download' in key.lower()
             }
-            
+
             try:
                 ip_address = request.headers['x-forwarded-for']
             except:
