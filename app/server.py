@@ -45,8 +45,6 @@ app.mount('/static', StaticFiles(directory=templates_path.resolve()), 'static')
 @app.exception_handler(StarletteHTTPException)
 async def http_exception_handler(request, exc):
     start_code = exc.status_code
-    logger.info(exc)
-
     if request.url.path.split('/')[1] == 'api':
         return JSONResponse(
             content={'status_code': start_code, 'message': exc.detail},
@@ -55,7 +53,6 @@ async def http_exception_handler(request, exc):
         )
     base_url = request.base_url
     if settings.HTTPS:
-        logger.info(f'https {settings.HTTPS}')
         base_url = f'{base_url}'.replace('http://', 'https://')
     return templates.TemplateResponse(
         'error.html',
