@@ -23,14 +23,10 @@ app = FastAPI()
 app.add_middleware(TokenMiddleware)
 app.add_middleware(Analytics, api_name=settings.API_NAME)
 
-# Função para verificar se a origem está autorizada
-def check_origin(origin: str) -> bool:
-    allowed_origins = settings.ORIGINS
-    return  origin.endswith(".lapig.iesa.ufg.br") and origin.startswith("https://") or any(origin == allowed  for allowed in allowed_origins)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=check_origin,
+    allow_origins=["https://*.lapig.iesa.ufg.br", *settings.ORIGINS],
     allow_credentials=True,
     allow_methods=['*'],
     allow_headers=['*'],

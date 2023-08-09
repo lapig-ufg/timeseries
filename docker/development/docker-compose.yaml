@@ -15,5 +15,5 @@ services:
     restart: always
     stdin_open: true
     tty: true
- #   volumes:
- #     - ../..:/APP/timeseries
+    volumes:
+      - ../..:/APP/timeseries
