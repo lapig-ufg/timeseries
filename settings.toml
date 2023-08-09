@@ -28,17 +28,12 @@ connect_args = {check_same_thread=false}
 echo = false
 
 
-
 [main]
-PORT=8000
+HTTPS = true
+PORT=3000
 HOST='0.0.0.0'
-ORIGINS=[
-    "https://tvi.lapig.iesa.ufg.br"
-]
 
 [develop]
-PORT=8000
+HTTPS = true
+PORT=3000
 HOST='0.0.0.0'
-ORIGINS=[
-    "https://tvi.lapig.iesa.ufg.br"
-]
