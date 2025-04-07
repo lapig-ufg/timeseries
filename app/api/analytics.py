@@ -1,17 +1,14 @@
-
-from fastapi import APIRouter, HTTPException, Query, Request
-from fastapi.responses import HTMLResponse
-from pymongo import MongoClient
 import io
-
-from app.config import settings, logger
-from app.db import ActiveMongo
-from app.models.tvi import ServerTVI
-from fastapi.responses import StreamingResponse
 
 import geopandas as gpd
 import pandas as pd
+from fastapi import APIRouter, HTTPException, Query
+from fastapi.responses import StreamingResponse
+from pymongo import MongoClient
 
+from app.config import logger
+from app.db import ActiveMongo
+from app.models.tvi import ServerTVI
 
 router = APIRouter()
 
@@ -136,18 +133,9 @@ async def get_resumo(
     except:
         logger.exception('Error')
         HTTPException(status_code=404, detail="Item not found")
-        
-        
-        
-import pandas as pd
-from fastapi import FastAPI
-from fastapi.responses import StreamingResponse
 
 
-app = FastAPI()
-
-
-@app.get("/data/", response_class=StreamingResponse)
+@router.get("/data/", response_class=StreamingResponse)
 async def export_data():
     # Create a sample dataframe
     df = pd.DataFrame({'col1': [1, 2], 'col2': [3, 4]})

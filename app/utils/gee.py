@@ -1,31 +1,8 @@
 from datetime import date
-from glob import glob
-from random import randint
-
 import ee
-
-from app.config import settings
-
-
-def gee_multi_credentials(credentials_dir):
-    def mpb_get_credentials_path():
-        credentials_files = ee.oauth.credentials_files
-
-        credential = credentials_files[randint(0, 5)]
-        ee.oauth.current_credentials_idx += 1
-
-        return credential
-
-    ee.oauth.current_credentials_idx = 0
-    ee.oauth.credentials_files = glob(credentials_dir + '/*.json')
-
-    ee.oauth.get_credentials_path = mpb_get_credentials_path
 
 
 def getMODIS_Series(lon, lat):
-    gee_multi_credentials(settings.GEE_CREDENCIALS_DIR)
-    ee.Initialize()
-
     def mask_badPixels(img):
         mask = img.select('SummaryQA').eq(0)
         img = img.mask(mask)
@@ -57,5 +34,4 @@ def getMODIS_Series(lon, lat):
                 }
             )
 
-    ee.Reset()
     return data

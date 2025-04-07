@@ -12,9 +12,8 @@ HOST='127.0.0.1'
 MONGODB_URL = 'localhost:27017'
 MONGO_DB='timeseries'
 
-SERVER_URL='http://localhost:3002'
-GEE_CREDENCIALS_DIR=''
-
+SERVER_URL='http://localhost:3000'
+#PRIVATE_KEY_FILE='/app/.service-accounts/gee.json'
 LOG_CONFIG=''
 
 ORIGINS=[
@@ -37,3 +36,6 @@ HOST='0.0.0.0'
 HTTPS = true
 PORT=3000
 HOST='0.0.0.0'
+#PRIVATE_KEY_FILE='/home/tharles/Downloads/GEE/blissful-axiom-314717-845a6f8c6805.json'
+
+

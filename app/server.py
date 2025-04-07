@@ -1,8 +1,9 @@
-import os
 from json import load as jload
 from pathlib import Path
 
+import ee
 from fastapi import FastAPI, status
+from fastapi import HTTPException
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
@@ -10,11 +11,12 @@ from fastapi.openapi.utils import get_openapi
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from google.oauth2 import service_account
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.config import logger, settings, start_logger
-from app.middleware.analytics import Analytics
 from app.middleware.TokenMiddleware import TokenMiddleware
+from app.middleware.analytics import Analytics
 from app.routers import created_routes
 
 start_logger()
@@ -23,18 +25,21 @@ app = FastAPI()
 app.add_middleware(TokenMiddleware)
 app.add_middleware(Analytics, api_name=settings.API_NAME)
 
+from app.utils.cors import origin_regex, allow_origins
 
+# Configurações CORS com expressões regulares para subdomínios dinâmicos
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://*.lapig.iesa.ufg.br", *settings.ORIGINS],
-    allow_credentials=True,
-    allow_methods=['*'],
-    allow_headers=['*'],
+    allow_origins=allow_origins,  # Lista de origens estáticas (deixe vazio se estiver usando regex)
+    allow_methods=["*"],  # Métodos permitidos
+    allow_headers=["*"],  # Cabeçalhos permitidos
+    allow_credentials=True,  # Permite o envio de cookies/credenciais
+    allow_origin_regex=origin_regex,
+    expose_headers=["X-Response-Time"],  # Cabeçalhos expostos
+    max_age=3600,  # Tempo máximo para cache da resposta preflight
 )
 
-
 app = created_routes(app)
-
 
 templates_path = Path('templates')
 templates = Jinja2Templates(directory=templates_path)
@@ -81,17 +86,30 @@ async def validation_exception_handler(request, exc):
 @app.on_event('startup')
 async def startup():
     logger.debug('startup')
-    """Perform startup activities."""
-    # If you have any startup activities that need to be defined,
-    # define them here.
-    pass
+    """
+    Inicializa o Google Earth Engine usando um arquivo de chave privada de Service Account.
+
+    Args:
+        private_key_file (str): Caminho para o arquivo de chave privada (.json).
+    """
+    try:
+        service_account_file = settings.PRIVATE_KEY_FILE
+        logger.info(f"service_account_file: {service_account_file}")
+        credentials = service_account.Credentials.from_service_account_file(
+            service_account_file,
+            scopes=["https://www.googleapis.com/auth/earthengine.readonly"],
+        )
+        ee.Initialize(credentials=credentials, project='blissful-axiom-314717')
+
+        logger.info("GEE Initialized successfully.")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Failed to initialize GEE")
 
 
 @app.on_event('shutdown')
 async def shutdown():
     """Perform shutdown activities."""
-    # If you have any shutdown activities that need to be defined,
-    # define them here.
+    ee.Reset()
     pass
 
 
@@ -119,4 +137,3 @@ def custom_openapi():
 
 
 app.openapi = custom_openapi
-
