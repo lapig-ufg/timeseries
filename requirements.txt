@@ -38,7 +38,7 @@ mdurl==0.1.2
 mypy-extensions==1.0.0
 numpy==2.2.4
 packaging==23.1
-pandas==2.0.3
+pandas==2.2.3
 pathspec==0.11.2
 pip-tools==7.2.0
 platformdirs==3.10.0
