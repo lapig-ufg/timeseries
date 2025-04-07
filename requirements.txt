@@ -70,6 +70,5 @@ tomli==2.0.1
 typer==0.9.0
 typing_extensions==4.7.1
 tzdata==2023.3
-uritemplate==3.0.1
 uritemplate==4.1.1
 urllib3==2.3.0
