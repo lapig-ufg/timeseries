@@ -12,7 +12,7 @@ dynaconf==3.2.0
 earthengine-api==1.5.9
 exceptiongroup==1.1.2
 fastapi==0.75.2
-Fiona==1.9.4.post1
+Fiona==1.10.1
 future==0.18.3
 geopandas==0.13.2
 google-api-core==2.24.2
