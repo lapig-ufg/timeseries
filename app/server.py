@@ -99,7 +99,7 @@ async def startup():
             service_account_file,
             scopes=["https://www.googleapis.com/auth/earthengine.readonly"],
         )
-        ee.Initialize(credentials=credentials, project='blissful-axiom-314717')
+        ee.Initialize(credentials=credentials)
 
         logger.info("GEE Initialized successfully.")
     except Exception as e:

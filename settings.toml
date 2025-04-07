@@ -15,7 +15,7 @@ MONGO_DB='timeseries'
 SERVER_URL='http://localhost:3000'
 #PRIVATE_KEY_FILE='/app/.service-accounts/gee.json'
 LOG_CONFIG=''
-
+ALLOW_ORIGINS=''
 ORIGINS=[
     "http://localhost:3000",
     "http://localhost:4200",
