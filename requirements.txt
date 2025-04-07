@@ -14,7 +14,7 @@ exceptiongroup==1.1.2
 fastapi==0.75.2
 Fiona==1.10.1
 future==0.18.3
-geopandas==0.13.2
+geopandas==1.0.1
 google-api-core==2.24.2
 google-api-python-client==2.166.0
 google-auth==2.38.0
